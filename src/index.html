@@ -1,0 +1,57 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+  <input type="number" id="databaseSize" value="100"> <button type="button" onclick="generateData(Number(document.getElementById('databaseSize').value))">generate database</button><br>
+  &#949;: <input type="number" onchange="histogramData = [];" value="1" id="epsilon"><br>
+  selector: <input type="text" id="selector" value="true"/>
+  <fieldset>
+    <input type="radio" onchange="updateSensitivity();" id="count" name="method" value="count" checked>
+    <label for="count"> count</label>
+    <input type="radio" onchange="updateSensitivity();" id="average" name="method" value="average">
+    <label for="average"> average</label>
+    <input type="radio" onchange="updateSensitivity();" id="max" name="method" value="max">
+    <label for="max"> max</label>
+  </fieldset>
+  <button type="button" onclick="performMethod()">query</button>
+  <div id="trueValue"></div>
+  <div id="privatizedValue"></div>
+  <div id="sensitivity"></div>
+  <div id="cummulativeEpsilon"></div>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+  <script src="js/vendor/modernizr-{{MODERNIZR_VERSION}}.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="js/vendor/jquery-{{JQUERY_VERSION}}.min.js"><\/script>')</script>
+  <script src="js/plugins.js"></script>
+  <script src="js/main.js"></script>
+
+  <div id="data_table"></div>
+  <div id="plot"></div>
+</body>
+
+</html>
