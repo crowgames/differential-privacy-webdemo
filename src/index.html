@@ -13,45 +13,117 @@
   <!-- Place favicon.ico in the root directory -->
 
   <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
-  <!--[if lte IE 9]>
-    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+  your browser</a> to improve your experience and security.</p>
+<![endif]-->
 
-  <!-- Add your site or application content here -->
-  <input type="number" id="databaseSize" value="100"> <button type="button" onclick="generateData(Number(document.getElementById('databaseSize').value))">generate database</button><br>
-  &#949;: <input type="number" onchange="histogramData = [];" value="1" id="epsilon"><br>
-  selector: <input type="text" id="selector" value="true"/>
-  <fieldset>
-    <input type="radio" onchange="updateSensitivity();" id="count" name="method" value="count" checked>
-    <label for="count"> count</label>
-    <input type="radio" onchange="updateSensitivity();" id="average" name="method" value="average">
-    <label for="average"> average</label>
-    <input type="radio" onchange="updateSensitivity();" id="max" name="method" value="max">
-    <label for="max"> max</label>
-  </fieldset>
-  <button type="button" onclick="performMethod()">query</button>
-  <div id="trueValue"></div>
-  <div id="privatizedValue"></div>
-  <div id="sensitivity"></div>
-  <div id="cummulativeEpsilon"></div>
+<!-- Add your site or application content here -->
+<div class="row">
+  <div class="col-3">
+    <input type="number" id="databaseSize" value="100">
+    <button type="button" class="btn btn-secondary"
+            onclick="generateData(Number(document.getElementById('databaseSize').value))">generate
+      database
+    </button><br><br>
+    <table width="100%">
+      <tr>
+        <td>&#949;:</td>
+        <td>
+          <input type="number" onchange="histogramData = [];" value="1" id="epsilon">
+        </td>
+      </tr>
+      <tr>
+        <td>selector:</td>
+        <td>
+          <input type="text" id="selector" value="true"/>
+        </td>
+      </tr>
+      <tr>
+        <td>method:</td>
+        <td>
+          <fieldset>
+            <input type="radio" onchange="updateSensitivity();" id="count" name="method" value="count" checked>
+            <label for="count"> count</label>
+            <input type="radio" onchange="updateSensitivity();" id="average" name="method" value="average">
+            <label for="average"> average</label>
+            <input type="radio" onchange="updateSensitivity();" id="max" name="method" value="max">
+            <label for="max"> max</label>
+          </fieldset>
+        </td>
+      </tr>
+    </table><br><br>
 
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
-  <script src="js/vendor/modernizr-{{MODERNIZR_VERSION}}.min.js"></script>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script
-    src="https://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="js/vendor/jquery-{{JQUERY_VERSION}}.min.js"><\/script>')</script>
-  <script src="js/plugins.js"></script>
-  <script src="js/main.js"></script>
+    <button type="button" class="btn btn-primary" onclick="performMethod()">query</button><br><br>
+    <button type="button" class="btn btn-info" onclick="cummulativeEpsilon = 0; updateSensitivity();">reset cummulative epsilon</button> 
+    <button type="button" class="btn btn-info" onclick="histogramData = []; updateSensitivity();">reset histogram epsilon</button>
+  </div>
+  <div class="col-3">
+    <div class="card text-white bg-primary " style="width: 18rem;">
+      <div class="card-header">
+        Privatized value
+      </div>
+      <div class="card-body">
+        <h5 class="card-title" id="privatizedValue">---</h5>
+      </div>
+    </div><br>
 
-  <div id="data_table"></div>
-  <div id="plot"></div>
+    <div class="card" style="width: 18rem;">
+      <div class="card-header">
+        Real value
+      </div>
+      <div class="card-body">
+        <h5 class="card-title" id="trueValue">---</h5>
+      </div>
+    </div><br>
+
+    <div class="card" style="width: 18rem;">
+      <div class="card-header">
+        Sensitivity
+      </div>
+      <div class="card-body">
+        <h5 class="card-title" id="sensitivity">&Delta; f</h5>
+      </div>
+    </div><br>
+
+    <div class="card" style="width: 18rem;">
+      <div class="card-header">
+        Cummulative epsilon
+      </div>
+      <div class="card-body">
+        <h5 class="card-title" id="cummulativeEpsilon">---</h5>
+      </div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div id="plot"></div>
+  </div>
+</div>
+
+
+<div id="data_table"></div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
 </body>
 
 </html>

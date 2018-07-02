@@ -1,10 +1,12 @@
 data = [];
+cummulativeEpsilon = 0;
 
 function generateData(size) {
   data = [];
   histogramData = [];
+  cummulativeEpsilon = 0;
 
-  var htmlContent = "<table><tr><th>Gender</th><th>Age</th><th>Survival chances</th><th>Illness</th></tr>"
+  var htmlContent = "<table width='100%'><tr><th>Gender</th><th>Age</th><th>Survival chances</th><th>Illness</th></tr>"
 
   for (var i = 0; i < size; i++) {
     var age = Math.round(Math.random() * 100);
@@ -87,16 +89,19 @@ function performMethod(){
       // do whatever you want with the checked radio
       if(radios[i].value === "count"){
         eval("var output  = count(epsilon, val => "+selector+");");
+        cummulativeEpsilon += epsilon;
         updateDiagram(output);
         break;
       }
       if(radios[i].value === "average"){
         eval("var output  = average(epsilon, val => "+selector+");");
+        cummulativeEpsilon += epsilon;
         updateDiagram(output);
         break;
       }
       if(radios[i].value === "max"){
         eval("var output  = average(epsilon, val => "+selector+");");
+        cummulativeEpsilon += epsilon;
         updateDiagram(output);
         break;
       }
@@ -121,8 +126,9 @@ function count(epsilon, method) {
 
 function updateDiagram(queryOutput){
 
-  document.getElementById("trueValue").innerHTML = "real value: <b>"+queryOutput.real+"</b>";
-  document.getElementById("privatizedValue").innerHTML = "privatized value: <b>"+queryOutput.privatized+"</b>";
+  document.getElementById("trueValue").innerHTML = queryOutput.real;
+  document.getElementById("privatizedValue").innerHTML = queryOutput.privatized;
+  document.getElementById("cummulativeEpsilon").innerHTML = cummulativeEpsilon;
   var trace1 = {
     x: [],
     y: [],
@@ -179,4 +185,8 @@ function updateDiagram(queryOutput){
 
   Plotly.newPlot('plot', plotdata, layout);
 
+}
+
+window.onload = function(){
+  updateSensitivity();
 }

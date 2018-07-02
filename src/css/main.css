@@ -5,16 +5,17 @@
  */
 
 #plot{
-  position: absolute;
-  top: 0px;
-  left: 50%;
-  width: 50%;
+  width:100%;
   height: 100vmin;
 }
 
 /* ==========================================================================
    Base styles: opinionated defaults
    ========================================================================== */
+
+body {
+  padding: 10px;
+}
 
 html {
     color: #222;
