@@ -130,12 +130,14 @@ function updateDiagram(queryOutput){
   document.getElementById("privatizedValue").innerHTML = queryOutput.privatized;
   document.getElementById("cummulativeEpsilon").innerHTML = cummulativeEpsilon;
   var trace1 = {
+    name: "expected <br>probability <br>density<br>distribution<br>",
     x: [],
     y: [],
     type: 'scatter'
   };
 
   var trace2 = {
+    name: "past <br>result<br>histogram",
     x: histogramData,
     type: 'histogram',
     opacity: 0.75,
