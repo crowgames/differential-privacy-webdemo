@@ -11,9 +11,9 @@ function generateData(size) {
   for (var i = 0; i < size; i++) {
     var age = Math.round(Math.random() * 100);
     var gender = Math.round(Math.random());
-    if(gender == 0){
+    if (gender == 0) {
       gender = "male";
-    }else{
+    } else {
       gender = "female";
     }
     var survivalChances = Math.round((Math.max(0, 1 - age / 200) - Math.random() * 0.2) * 100) / 100;
@@ -37,8 +37,8 @@ function generateData(size) {
   }
   htmlContent += "</table>";
 
-  var win = window.open("", "Generated data", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=200,top="+(screen.height-400)+",left="+(screen.width-840));
-  win.document.body.innerHTML = "<html><head><title>Generated data</title></head><body>"+htmlContent+"</body></html>";
+  var win = window.open("", "Generated data", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=200,top=" + (screen.height - 400) + ",left=" + (screen.width - 840));
+  win.document.body.innerHTML = "<html><head><title>Generated data</title></head><body>" + htmlContent + "</body></html>";
 }
 
 function sgn(x) {
@@ -56,51 +56,48 @@ function privatize(F, deltaF, epsilon) {
   return F + laplace(0.0, deltaF / epsilon);
 }
 
-function updateSensitivity(){
+function updateSensitivity() {
   var radios = document.getElementsByName('method');
 
-  for (var i = 0, length = radios.length; i < length; i++)
-  {
-    if (radios[i].checked)
-    {
+  for (var i = 0, length = radios.length; i < length; i++) {
+    if (radios[i].checked) {
       // do whatever you want with the checked radio
-      if(radios[i].value === "count"){
+      if (radios[i].value === "count") {
         document.getElementById("sensitivity").innerHTML = "&Delta;f: 1";
       }
-      if(radios[i].value === "average"){
-        document.getElementById("sensitivity").innerHTML = "&Delta;f: 1/n ";
+      if (radios[i].value === "average") {
+        document.getElementById("sensitivity").innerHTML = "&Delta;f: Range(field)/n ";
       }
-      if(radios[i].value === "max"){
+      if (radios[i].value === "max") {
         document.getElementById("sensitivity").innerHTML = "&Delta;f: Range(field)";
       }
     }
   }
 }
 
-function performMethod(){
+function performMethod() {
   var radios = document.getElementsByName('method');
   var epsilon = Number(document.getElementById("epsilon").value);
   var selector = document.getElementById("selector").value;
 
-  for (var i = 0, length = radios.length; i < length; i++)
-  {
-    if (radios[i].checked)
-    {
+  for (var i = 0, length = radios.length; i < length; i++) {
+    if (radios[i].checked) {
       // do whatever you want with the checked radio
-      if(radios[i].value === "count"){
-        eval("var output  = count(epsilon, val => "+selector+");");
+      if (radios[i].value === "count") {
+        eval("var output  = count(epsilon, val => " + selector + ");");
+        cummulativeEpsilon += epsilon;
+        updateDiagram(output);
+        document.getElementById("range").value = 1;
+        break;
+      }
+      if (radios[i].value === "average") {
+        eval("var output  = average(epsilon, val => " + selector + ");");
         cummulativeEpsilon += epsilon;
         updateDiagram(output);
         break;
       }
-      if(radios[i].value === "average"){
-        eval("var output  = average(epsilon, val => "+selector+");");
-        cummulativeEpsilon += epsilon;
-        updateDiagram(output);
-        break;
-      }
-      if(radios[i].value === "max"){
-        eval("var output  = average(epsilon, val => "+selector+");");
+      if (radios[i].value === "max") {
+        eval("var output  = max(epsilon, val => " + selector + ");");
         cummulativeEpsilon += epsilon;
         updateDiagram(output);
         break;
@@ -117,14 +114,64 @@ function count(epsilon, method) {
   var privatizedValue = privatize(trueValue, 1, epsilon);
   histogramData.push(privatizedValue);
 
-  console.log("epsilon: "+epsilon);
+  console.log("epsilon: " + epsilon);
 
   var b = 1 / epsilon;
 
   return {real: trueValue, privatized: privatizedValue, b: b};
 }
 
-function updateDiagram(queryOutput){
+function average(epsilon, method) {
+  var countValue = data.reduce((val1, val2) => val1 + (method(val2) ? 1 : 0), 0);
+  var field = document.getElementById('field').value;
+  var range = 1;
+  if (field.indexOf("age") >= 0) {
+    range = 110;
+    field = "age";
+  } else if (field.indexOf("survival") >= 0) {
+    range = 1;
+    field = "survivalChances";
+  } else {
+    alert("field is not valid");
+  }
+
+  var trueValue = data.reduce((val1, val2) => val1 + (method(val2) ? val2[field] : 0), 0) / countValue;
+  var privatizedValue = privatize(trueValue, range / countValue, epsilon);
+  histogramData.push(privatizedValue);
+
+  console.log("epsilon: " + epsilon);
+
+  var b = (range / countValue) / epsilon;
+
+  return {real: trueValue, privatized: privatizedValue, b: b};
+}
+
+function max(epsilon, method) {
+  var countValue = data.reduce((val1, val2) => val1 + (method(val2) ? 1 : 0), 0);
+  var field = document.getElementById('field').value;
+  var range = 1;
+  if (field.indexOf("age") >= 0) {
+    range = 110;
+    field = "age";
+  } else if (field.indexOf("survival") >= 0) {
+    range = 1;
+    field = "survivalChances";
+  } else {
+    alert("field is not valid");
+  }
+
+  var trueValue = Math.max(...data.map((val) => val[field]).filter((val2) => (method(val2))));
+  var privatizedValue = privatize(trueValue, range, epsilon);
+  histogramData.push(privatizedValue);
+
+  console.log("epsilon: " + epsilon);
+
+  var b = range / epsilon;
+
+  return {real: trueValue, privatized: privatizedValue, b: b};
+}
+
+function updateDiagram(queryOutput) {
 
   document.getElementById("trueValue").innerHTML = queryOutput.real;
   document.getElementById("privatizedValue").innerHTML = queryOutput.privatized;
@@ -143,7 +190,7 @@ function updateDiagram(queryOutput){
     opacity: 0.75,
     xbins: {
       end: queryOutput.real * 2,
-      size: queryOutput.b/3,
+      size: queryOutput.b / 3,
       start: 0
 
     },
@@ -169,19 +216,24 @@ function updateDiagram(queryOutput){
 
       //line vertical
 
-      {
-        type: 'line',
-        x0: queryOutput.privatized,
-        y0: 0,
-        x1: queryOutput.privatized,
-        y1: Math.max(...trace1.y),
-        line: {
-          color: 'rgb(255, 0, 0)',
-          width: 3
-        }
-      }
+
     ]
   };
+
+  if (queryOutput.privatized >= 0) {
+    layout.shapes.push({
+      type: 'line',
+      x0: queryOutput.privatized,
+      y0: 0,
+      x1: queryOutput.privatized,
+      y1: Math.max(...trace1.y),
+      line: {
+        color: 'rgb(255, 0, 0)',
+        width: 3
+      }
+    });
+  }
+
 
   var plotdata = [trace1, trace2];
 
@@ -189,6 +241,6 @@ function updateDiagram(queryOutput){
 
 }
 
-window.onload = function(){
+window.onload = function () {
   updateSensitivity();
 }
