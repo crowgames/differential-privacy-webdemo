@@ -173,6 +173,23 @@ function max(epsilon, method) {
 
 function updateDiagram(queryOutput) {
 
+  var xmin = 0;
+  var xmax = queryOutput.real * 2;
+
+  if(document.getElementById("xmin").value.length>0){
+    var temp = Number(document.getElementById("xmin").value);
+    if(!isNaN(temp)){
+      xmin = temp;
+    }
+  }
+
+  if(document.getElementById("xmax").value.length>0){
+    var temp = Number(document.getElementById("xmax").value);
+    if(!isNaN(temp)){
+      xmax = temp;
+    }
+  }
+
   document.getElementById("trueValue").innerHTML = queryOutput.real;
   document.getElementById("privatizedValue").innerHTML = queryOutput.privatized;
   document.getElementById("cummulativeEpsilon").innerHTML = cummulativeEpsilon;
@@ -197,6 +214,8 @@ function updateDiagram(queryOutput) {
     yaxis: 'y2'
   };
 
+
+
   for (var x = 0; x < queryOutput.real * 2; x += 0.1) {
     trace1.x.push(x);
     trace1.y.push(1 / (2 * queryOutput.b) * Math.exp(-Math.abs(queryOutput.real - x) / queryOutput.b));
@@ -204,6 +223,8 @@ function updateDiagram(queryOutput) {
 
   var layout = {
     title: 'expected and real distribution',
+
+    xaxis: {range: [xmin, xmax]},
     yaxis: {title: 'probability density function'},
     yaxis2: {
       title: 'occurence count',
@@ -220,7 +241,7 @@ function updateDiagram(queryOutput) {
     ]
   };
 
-  if (queryOutput.privatized >= 0) {
+  if (queryOutput.privatized >= 0 && queryOutput.privatized  < queryOutput.real * 2) {
     layout.shapes.push({
       type: 'line',
       x0: queryOutput.privatized,
